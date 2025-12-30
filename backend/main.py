@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 
 from routes.outputs import router as outputs_router
+from routes.assets import router as assets_router
 
 load_dotenv()
 
@@ -19,6 +20,7 @@ app.add_middleware(
 
 
 app.include_router(outputs_router)
+app.include_router(assets_router)
 
 
 @app.get("/health")
