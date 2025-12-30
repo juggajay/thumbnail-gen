@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface-deep: #0a0a0a;
+  --surface: #141414;
+  --surface-elevated: #1f1f1f;
+  --surface-overlay: #262626;
+  --border: #2a2a2a;
+  --accent: #00d4ff;
+  --accent-hover: #00b8e6;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a #141414;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+body {
+  @apply bg-surface-deep text-white font-sans antialiased;
+  background: linear-gradient(180deg, #0a0a0a 0%, #0d0d0d 100%);
+  min-height: 100vh;
+}
+
+/* Glow effects */
+.glow-accent {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+}
+
+.glow-accent-strong {
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.25);
+}
+
+/* Smooth transitions */
+.transition-all-200 {
+  @apply transition-all duration-200 ease-out;
+}
+
+/* Card hover effect */
+.card-hover {
+  @apply transition-all duration-200;
+}
+
+.card-hover:hover {
+  @apply bg-surface-overlay border-border-focus;
+  transform: translateY(-1px);
+}
