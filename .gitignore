@@ -1,0 +1,25 @@
+# Environment
+.env
+__pycache__/
+*.pyc
+node_modules/
+.venv/
+venv/
+
+# Data (user content)
+data/templates/*
+data/assets/*
+data/outputs/*
+data/config.json
+!data/templates/.gitkeep
+!data/assets/.gitkeep
+!data/outputs/.gitkeep
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
