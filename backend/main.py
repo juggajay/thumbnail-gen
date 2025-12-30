@@ -19,7 +19,9 @@ app.add_middleware(
 
 # Import and register routes
 from routes.templates import router as templates_router
+from routes.generate import router as generate_router
 app.include_router(templates_router)
+app.include_router(generate_router)
 
 # Serve static files (assets and outputs)
 data_dir = Path(os.getenv("DATA_DIR", "./data"))
