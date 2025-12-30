@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
+from routes.outputs import router as outputs_router
+
 load_dotenv()
 
 app = FastAPI(title="Thumbnail Generator API", version="1.0.0")
@@ -14,6 +16,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(outputs_router)
 
 
 @app.get("/health")
