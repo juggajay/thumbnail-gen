@@ -26,14 +26,38 @@ export function AssetLibrary() {
     accept: { "font/*": [".ttf", ".otf", ".woff", ".woff2"] },
   });
 
+  const subjectDropzone = useDropzone({
+    onDrop: (files) => onDrop(files, "subjects"),
+    accept: { "image/*": [".png"] },
+  });
+
+  const selectSubject = (filename: string) => {
+    if (!selectedTemplate) {
+      alert("Please create or select a template first!\n\nGo to Editor tab → Click '+ New' in the sidebar");
+      return;
+    }
+    updateTemplate(selectedTemplate.id, {
+      subject: {
+        ...selectedTemplate.subject,
+        enabled: true,
+        image: filename,
+      },
+    });
+    alert(`Subject "${filename}" selected for template "${selectedTemplate.name}"!\n\nGo to Editor tab → Subject tab to adjust positioning.`);
+  };
+
   const selectBackground = (filename: string) => {
-    if (!selectedTemplate) return;
+    if (!selectedTemplate) {
+      alert("Please create or select a template first!\n\nGo to Editor tab → Click '+ New' in the sidebar");
+      return;
+    }
     updateTemplate(selectedTemplate.id, {
       background: {
         ...selectedTemplate.background,
         fixed_images: [filename],
       },
     });
+    alert(`Background "${filename}" selected for template "${selectedTemplate.name}"!\n\nGo to Editor tab to see it.`);
   };
 
   return (
@@ -106,6 +130,71 @@ export function AssetLibrary() {
         )}
       </section>
 
+      {/* Subjects */}
+      <section className="mb-10">
+        <h3 className="text-sm font-mono font-semibold text-white/80 uppercase tracking-wider mb-4">
+          Subjects
+          <span className="ml-2 text-white/40 font-normal normal-case">
+            (PNG cutouts for foreground layer)
+          </span>
+        </h3>
+        <div
+          {...subjectDropzone.getRootProps()}
+          className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer mb-6 transition-all duration-200 ${
+            subjectDropzone.isDragActive
+              ? "border-accent bg-accent/10"
+              : "border-border hover:border-white/30 hover:bg-surface-elevated"
+          }`}
+        >
+          <input {...subjectDropzone.getInputProps()} />
+          <p className="text-white/60 text-sm">
+            Drop PNG cutouts here or <span className="text-accent">browse</span>
+          </p>
+          <p className="text-white/30 text-xs mt-1">PNG with transparency</p>
+        </div>
+
+        {!assets.subjects || assets.subjects.length === 0 ? (
+          <div className="text-center py-6 text-white/30 text-sm">
+            No subjects uploaded
+          </div>
+        ) : (
+          <div className="grid grid-cols-5 gap-4">
+            {assets.subjects.map((asset) => (
+              <div
+                key={asset.id}
+                className="group relative rounded-xl overflow-hidden border border-border hover:border-accent/50 transition-all"
+                style={{ backgroundColor: '#1a1a1a' }}
+              >
+                <div className="aspect-square flex items-center justify-center p-2">
+                  <img
+                    src={assetsApi.getUrl("subjects", asset.filename)}
+                    alt={asset.filename}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3 gap-2">
+                  <button
+                    onClick={() => selectSubject(asset.filename)}
+                    className="bg-accent hover:bg-accent-hover text-surface-deep px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                  >
+                    Use
+                  </button>
+                  <button
+                    onClick={() => deleteAsset("subjects", asset.filename)}
+                    className="bg-red-500/80 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+                <div className="p-2">
+                  <p className="text-xs text-white/60 truncate font-mono">{asset.filename}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
       {/* Fonts */}
       <section className="mb-10">
         <h3 className="text-sm font-mono font-semibold text-white/80 uppercase tracking-wider mb-4">
@@ -157,6 +246,49 @@ export function AssetLibrary() {
             ))}
           </div>
         )}
+      </section>
+
+      {/* Keeper Expressions */}
+      <section className="mb-10">
+        <h3 className="text-sm font-mono font-semibold text-white/80 uppercase tracking-wider mb-4">
+          Keeper Expressions
+          <span className="ml-2 text-white/40 font-normal normal-case">
+            ({assets.keeper?.length || 0} cutouts)
+          </span>
+        </h3>
+
+        {!assets.keeper || assets.keeper.length === 0 ? (
+          <div className="text-center py-8 text-white/30 text-sm border border-dashed border-border rounded-xl">
+            No Keeper expressions loaded
+          </div>
+        ) : (
+          <div className="grid grid-cols-5 gap-4">
+            {assets.keeper.map((asset) => (
+              <div
+                key={asset.id}
+                className="group relative rounded-xl overflow-hidden border border-border hover:border-accent/50 transition-all"
+                style={{ backgroundColor: '#1a1a1a' }}
+              >
+                <div className="aspect-square flex items-center justify-center p-2">
+                  <img
+                    src={assetsApi.getUrl("keeper", asset.filename)}
+                    alt={asset.filename}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-xs text-white/80 truncate font-mono text-center">
+                    {asset.filename.replace('.png', '').replace(/_/g, ' ')}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <p className="mt-4 text-xs text-white/40">
+          These expressions are used for The Keeper channel thumbnails. Add them to templates via the Editor.
+        </p>
       </section>
     </div>
   );

@@ -57,23 +57,67 @@ def get_job_status(job_id: str):
     )
 
 
+from pydantic import BaseModel
+
+class PreviewRequest(BaseModel):
+    template_id: str
+    data: dict
+    background_override: Optional[str] = None
+
 @router.post("/preview")
-async def preview_thumbnail(
-    template_id: str,
-    episode_data: dict,
-    background_override: Optional[str] = None,
-):
+async def preview_thumbnail(request: PreviewRequest):
     """Generate a preview without saving to outputs"""
-    template = storage.get_template(template_id)
+    template = storage.get_template(request.template_id)
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
 
     try:
-        image_bytes = renderer.render(template, episode_data, background_override)
+        image_bytes = renderer.render(template, request.data, request.background_override)
         return {
             "image": base64.b64encode(image_bytes).decode("utf-8"),
             "format": "png",
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class GenerateBackgroundRequest(BaseModel):
+    prompt: str
+    negative_prompt: str = "text, words, watermark, blurry, people"
+    width: int = 1280
+    height: int = 720
+
+
+@router.post("/background")
+async def generate_background(request: GenerateBackgroundRequest):
+    """Generate an AI background image and save it to assets"""
+    if not imagen.is_available():
+        raise HTTPException(
+            status_code=503,
+            detail="AI generation not available. Set GEMINI_API_KEY in environment."
+        )
+
+    try:
+        image_bytes = imagen.generate(
+            prompt=request.prompt,
+            negative_prompt=request.negative_prompt,
+            width=request.width,
+            height=request.height,
+        )
+
+        if not image_bytes:
+            raise HTTPException(status_code=500, detail="Failed to generate image")
+
+        # Save to backgrounds folder with unique name
+        filename = f"ai-bg-{uuid.uuid4().hex[:8]}.png"
+        result = storage.save_asset("backgrounds", filename, image_bytes)
+
+        return {
+            "success": True,
+            "filename": filename,
+            "path": result["path"],
+        }
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

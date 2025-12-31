@@ -5,6 +5,8 @@ import type {
   Output,
   GenerateRequest,
   GenerateResponse,
+  AnalysisContext,
+  AnalysisResult,
 } from "./types";
 
 const API_BASE = "http://localhost:8000";
@@ -37,7 +39,7 @@ export const templates = {
 export const assets = {
   list: () =>
     api
-      .get<{ backgrounds: Asset[]; fonts: Asset[]; overlays: Asset[] }>("/api/assets")
+      .get<{ backgrounds: Asset[]; fonts: Asset[]; overlays: Asset[]; subjects: Asset[]; keeper: Asset[] }>("/api/assets")
       .then((r) => r.data),
 
   upload: (type: string, file: File) => {
@@ -72,8 +74,28 @@ export const generate = {
 
   preview: (templateId: string, data: Record<string, string>) =>
     api
-      .post<{ image: string; format: string }>("/api/generate/preview", null, {
-        params: { template_id: templateId, episode_data: JSON.stringify(data) },
+      .post<{ image: string; format: string }>("/api/generate/preview", {
+        template_id: templateId,
+        data: data,
+      })
+      .then((r) => r.data),
+
+  background: (prompt: string, negativePrompt: string = "") =>
+    api
+      .post<{ success: boolean; filename: string; path: string }>("/api/generate/background", {
+        prompt,
+        negative_prompt: negativePrompt,
+      })
+      .then((r) => r.data),
+};
+
+// Analyze
+export const analyze = {
+  thumbnail: (imageBase64: string, context: AnalysisContext) =>
+    api
+      .post<AnalysisResult>("/api/analyze", {
+        image: imageBase64,
+        context,
       })
       .then((r) => r.data),
 };
@@ -83,4 +105,5 @@ export default {
   assets,
   outputs,
   generate,
+  analyze,
 };

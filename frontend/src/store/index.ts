@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Template, Asset, Output } from "../api/types";
+import type { Template, Asset, Output, AnalysisResult } from "../api/types";
 import api from "../api/client";
 
 interface AppState {
@@ -18,6 +18,8 @@ interface AppState {
     backgrounds: Asset[];
     fonts: Asset[];
     overlays: Asset[];
+    subjects: Asset[];
+    keeper: Asset[];
   };
   loadAssets: () => Promise<void>;
   uploadAsset: (type: string, file: File) => Promise<Asset>;
@@ -37,6 +39,24 @@ interface AppState {
   // Generation
   isGenerating: boolean;
   generateThumbnail: (episodeId: string, data: Record<string, string>) => Promise<void>;
+
+  // Analysis panel
+  analysisPanel: {
+    isOpen: boolean;
+    isAnalyzing: boolean;
+    result: AnalysisResult | null;
+    error: string | null;
+  };
+  videoContext: {
+    title: string;
+    emotion: string;
+  };
+  toggleAnalysisPanel: () => void;
+  setAnalysisPanelOpen: (open: boolean) => void;
+  setVideoContext: (title: string, emotion: string) => void;
+  setAnalyzing: (analyzing: boolean) => void;
+  setAnalysisResult: (result: AnalysisResult | null) => void;
+  setAnalysisError: (error: string | null) => void;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -91,6 +111,8 @@ export const useStore = create<AppState>((set, get) => ({
     backgrounds: [],
     fonts: [],
     overlays: [],
+    subjects: [],
+    keeper: [],
   },
 
   loadAssets: async () => {
@@ -170,4 +192,47 @@ export const useStore = create<AppState>((set, get) => ({
       set({ isGenerating: false });
     }
   },
+
+  // Analysis panel
+  analysisPanel: {
+    isOpen: false,
+    isAnalyzing: false,
+    result: null,
+    error: null,
+  },
+  videoContext: {
+    title: '',
+    emotion: 'curiosity',
+  },
+
+  toggleAnalysisPanel: () =>
+    set((state) => ({
+      analysisPanel: {
+        ...state.analysisPanel,
+        isOpen: !state.analysisPanel.isOpen,
+      },
+    })),
+
+  setAnalysisPanelOpen: (open) =>
+    set((state) => ({
+      analysisPanel: { ...state.analysisPanel, isOpen: open },
+    })),
+
+  setVideoContext: (title, emotion) =>
+    set({ videoContext: { title, emotion } }),
+
+  setAnalyzing: (analyzing) =>
+    set((state) => ({
+      analysisPanel: { ...state.analysisPanel, isAnalyzing: analyzing },
+    })),
+
+  setAnalysisResult: (result) =>
+    set((state) => ({
+      analysisPanel: { ...state.analysisPanel, result, error: null },
+    })),
+
+  setAnalysisError: (error) =>
+    set((state) => ({
+      analysisPanel: { ...state.analysisPanel, error, isAnalyzing: false },
+    })),
 }));

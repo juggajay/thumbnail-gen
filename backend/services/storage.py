@@ -21,6 +21,8 @@ class StorageService:
         (self.assets_dir / "backgrounds").mkdir(parents=True, exist_ok=True)
         (self.assets_dir / "fonts").mkdir(parents=True, exist_ok=True)
         (self.assets_dir / "overlays").mkdir(parents=True, exist_ok=True)
+        (self.assets_dir / "subjects").mkdir(parents=True, exist_ok=True)
+        (self.assets_dir / "keeper").mkdir(parents=True, exist_ok=True)
         self.outputs_dir.mkdir(parents=True, exist_ok=True)
 
     # Templates

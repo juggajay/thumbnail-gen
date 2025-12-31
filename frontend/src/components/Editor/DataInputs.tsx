@@ -21,40 +21,37 @@ export function DataInputs() {
     generateThumbnail(episodeId, previewData);
   };
 
+  const zoneNames = Object.keys(selectedTemplate.zones);
+
   return (
-    <div className="p-4 border-t border-border">
+    <div className="p-4">
       <h3 className="text-sm font-mono font-semibold text-white/80 uppercase tracking-wider mb-4">
         Test Data
       </h3>
 
       <div className="space-y-4">
-        <div>
-          <label className="text-[10px] font-mono text-white/40 uppercase">Headline</label>
-          <input
-            type="text"
-            value={previewData.headline || ""}
-            onChange={(e) =>
-              setPreviewData({ ...previewData, headline: e.target.value })
-            }
-            placeholder="MAIL SERVER CRITICAL"
-            className="w-full bg-surface-deep border border-border px-3 py-2 rounded-lg text-sm text-white placeholder-white/20 mt-1 outline-none focus:border-accent/50 transition-colors"
-          />
-        </div>
-
-        <div>
-          <label className="text-[10px] font-mono text-white/40 uppercase">Severity</label>
-          <select
-            value={previewData.severity || ""}
-            onChange={(e) =>
-              setPreviewData({ ...previewData, severity: e.target.value })
-            }
-            className="w-full bg-surface-deep border border-border px-3 py-2 rounded-lg text-sm text-white mt-1 outline-none focus:border-accent/50"
-          >
-            <option value="">None</option>
-            <option value="CRITICAL">CRITICAL</option>
-            <option value="HIGH">HIGH</option>
-          </select>
-        </div>
+        {zoneNames.length === 0 ? (
+          <div className="text-center py-4 text-white/30 text-sm border border-dashed border-border rounded-lg">
+            Add text zones in the Zones tab to enter content
+          </div>
+        ) : (
+          zoneNames.map((zoneName) => (
+            <div key={zoneName}>
+              <label className="text-[10px] font-mono text-white/40 uppercase">
+                {zoneName.replace(/_/g, " ")}
+              </label>
+              <input
+                type="text"
+                value={previewData[zoneName] || ""}
+                onChange={(e) =>
+                  setPreviewData({ ...previewData, [zoneName]: e.target.value })
+                }
+                placeholder={`Enter ${zoneName.replace(/_/g, " ")}...`}
+                className="w-full bg-surface-deep border border-border px-3 py-2 rounded-lg text-sm text-white placeholder-white/20 mt-1 outline-none focus:border-accent/50 transition-colors"
+              />
+            </div>
+          ))
+        )}
 
         <div className="flex gap-2 pt-2">
           <button
