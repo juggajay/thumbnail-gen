@@ -693,8 +693,8 @@ function TextZonePreview({ zone, text, scale }: { zone: TextZone; text: string; 
 // Render subject layer
 function SubjectPreview({
   subject,
-  canvasWidth,
-  canvasHeight,
+  canvasWidth: _canvasWidth,
+  canvasHeight: _canvasHeight,
   scale,
   tempOffset,
 }: {
