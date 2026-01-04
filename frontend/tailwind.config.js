@@ -24,8 +24,17 @@ export default {
           hover: '#00b8e6',
           muted: '#00d4ff20',
         },
+        // New accent variant for secondary actions
+        'accent-cyan': {
+          DEFAULT: '#22d3ee',
+          hover: '#06b6d4',
+          glow: 'rgba(34, 211, 238, 0.15)',
+          strong: '#67e8f9',
+        },
       },
       fontFamily: {
+        display: ['Sora', 'system-ui', 'sans-serif'],
+        body: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
         sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
       },

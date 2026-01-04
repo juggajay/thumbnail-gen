@@ -28,12 +28,18 @@ from routes.assets import router as assets_router
 from routes.outputs import router as outputs_router
 from routes.generate import router as generate_router
 from routes.analyze import router as analyze_router
+from routes.headline import router as headline_router
+from routes.competitor import router as competitor_router
+from routes.queue import router as queue_router
 
 app.include_router(templates_router)
 app.include_router(assets_router)
 app.include_router(outputs_router)
 app.include_router(generate_router)
 app.include_router(analyze_router)
+app.include_router(headline_router)
+app.include_router(competitor_router)
+app.include_router(queue_router)
 
 # Ensure data directories exist
 data_dir = Path(os.getenv("DATA_DIR", "./data"))

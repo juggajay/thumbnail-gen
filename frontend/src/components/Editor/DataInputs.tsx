@@ -1,4 +1,11 @@
 import { useStore } from "../../store";
+import { HeadlineInput } from "../Generate/HeadlineInput";
+
+// Check if a zone name suggests it's a hook/headline field
+const isHookField = (name: string): boolean => {
+  const lower = name.toLowerCase();
+  return lower.includes('hook') || lower.includes('title') || lower.includes('headline');
+};
 
 export function DataInputs() {
   const {
@@ -37,18 +44,29 @@ export function DataInputs() {
         ) : (
           zoneNames.map((zoneName) => (
             <div key={zoneName}>
-              <label className="text-[10px] font-mono text-white/40 uppercase">
-                {zoneName.replace(/_/g, " ")}
-              </label>
-              <input
-                type="text"
-                value={previewData[zoneName] || ""}
-                onChange={(e) =>
-                  setPreviewData({ ...previewData, [zoneName]: e.target.value })
-                }
-                placeholder={`Enter ${zoneName.replace(/_/g, " ")}...`}
-                className="w-full bg-surface-deep border border-border px-3 py-2 rounded-lg text-sm text-white placeholder-white/20 mt-1 outline-none focus:border-accent/50 transition-colors"
-              />
+              {isHookField(zoneName) ? (
+                <HeadlineInput
+                  value={previewData[zoneName] || ''}
+                  onChange={(value) => setPreviewData({ ...previewData, [zoneName]: value })}
+                  placeholder={`Enter ${zoneName.replace(/_/g, ' ')}...`}
+                  label={zoneName.replace(/_/g, ' ')}
+                />
+              ) : (
+                <>
+                  <label className="text-[10px] font-mono text-white/40 uppercase">
+                    {zoneName.replace(/_/g, " ")}
+                  </label>
+                  <input
+                    type="text"
+                    value={previewData[zoneName] || ""}
+                    onChange={(e) =>
+                      setPreviewData({ ...previewData, [zoneName]: e.target.value })
+                    }
+                    placeholder={`Enter ${zoneName.replace(/_/g, " ")}...`}
+                    className="w-full bg-surface-deep border border-border px-3 py-2 rounded-lg text-sm text-white placeholder-white/20 mt-1 outline-none focus:border-accent/50 transition-colors"
+                  />
+                </>
+              )}
             </div>
           ))
         )}

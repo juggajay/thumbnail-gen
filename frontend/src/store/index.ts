@@ -2,7 +2,37 @@ import { create } from "zustand";
 import type { Template, Asset, Output, AnalysisResult } from "../api/types";
 import api from "../api/client";
 
+interface QueueJob {
+  id: string;
+  template_id: string;
+  episode_id: string;
+  data: Record<string, string>;
+  status: 'processing' | 'pending' | 'approved' | 'failed';
+  source: 'ui' | 'api';
+  created_at: string;
+  completed_at?: string;
+  output_path?: string;
+  error?: string;
+}
+
 interface AppState {
+  // Mode state
+  mode: 'generate' | 'design';
+  setMode: (mode: 'generate' | 'design') => void;
+
+  // Queue panel state
+  queuePanelOpen: boolean;
+  setQueuePanelOpen: (open: boolean) => void;
+  toggleQueuePanel: () => void;
+
+  // Queue data
+  queue: QueueJob[];
+  autoApprove: boolean;
+  loadQueue: () => Promise<void>;
+  approveJob: (jobId: string) => Promise<void>;
+  deleteJob: (jobId: string) => Promise<void>;
+  setAutoApprove: (enabled: boolean) => Promise<void>;
+
   // Templates
   templates: Template[];
   selectedTemplate: Template | null;
@@ -60,6 +90,60 @@ interface AppState {
 }
 
 export const useStore = create<AppState>((set, get) => ({
+  // Mode state
+  mode: 'generate',
+  setMode: (mode) => set({ mode }),
+
+  // Queue panel state
+  queuePanelOpen: false,
+  setQueuePanelOpen: (open) => set({ queuePanelOpen: open }),
+  toggleQueuePanel: () => set((state) => ({ queuePanelOpen: !state.queuePanelOpen })),
+
+  // Queue data
+  queue: [],
+  autoApprove: true,
+
+  loadQueue: async () => {
+    try {
+      const response = await fetch('/api/queue');
+      const data = await response.json();
+      set({ queue: data.jobs || [] });
+    } catch (error) {
+      console.error('Failed to load queue:', error);
+    }
+  },
+
+  approveJob: async (jobId: string) => {
+    try {
+      await fetch(`/api/queue/${jobId}/approve`, { method: 'POST' });
+      get().loadQueue();
+    } catch (error) {
+      console.error('Failed to approve job:', error);
+    }
+  },
+
+  deleteJob: async (jobId: string) => {
+    try {
+      await fetch(`/api/queue/${jobId}`, { method: 'DELETE' });
+      get().loadQueue();
+    } catch (error) {
+      console.error('Failed to delete job:', error);
+    }
+  },
+
+  setAutoApprove: async (enabled: boolean) => {
+    try {
+      await fetch('/api/queue/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ auto_approve: enabled })
+      });
+      set({ autoApprove: enabled });
+    } catch (error) {
+      console.error('Failed to update auto-approve:', error);
+    }
+  },
+
   // Templates
   templates: [],
   selectedTemplate: null,

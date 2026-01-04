@@ -1,17 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
+  /* Surface colors */
   --surface-deep: #0a0a0a;
   --surface: #141414;
   --surface-elevated: #1f1f1f;
   --surface-overlay: #262626;
   --border: #2a2a2a;
+
+  /* Primary accent */
   --accent: #00d4ff;
   --accent-hover: #00b8e6;
+
+  /* Secondary accent (cyan variant) */
+  --accent-cyan: #22d3ee;
+  --accent-cyan-hover: #06b6d4;
+  --accent-cyan-glow: rgba(34, 211, 238, 0.15);
+}
+
+/* Font utility classes */
+.font-display {
+  font-family: 'Sora', system-ui, sans-serif;
+}
+
+.font-body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 * {
